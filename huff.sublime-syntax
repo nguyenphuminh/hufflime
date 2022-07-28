@@ -1,0 +1,103 @@
+%YAML 1.2
+---
+name: Huff
+file_extensions: [huff]
+scope: source.huff
+
+contexts:
+  main:
+    - include: comment-single-line
+    - include: comment-multi-line
+    - include: numbers
+    - include: opcodes
+    - include: define
+    - include: interface
+    - include: constant
+    - include: include
+
+  comment-single-line:
+    - match: //
+      scope: punctuation.definition.comment.huff
+      push:
+        - meta_scope: comment.line.huff
+        - match: $\n?
+          pop: true
+
+  comment-multi-line:
+    - match: /\*
+      scope: punctuation.definition.comment.begin.huff
+      push:
+        - meta_scope: comment.block.huff
+        - match: \*/
+          scope: punctuation.definition.comment.end.huff
+          pop: true
+        - match: ^\s*(\*)(?!/)
+          captures:
+            1: punctuation.definition.comment.huff
+
+  include:
+    - match: ^\s*(#include)\s+(.*?)$
+      captures:
+        0: meta.include.huff
+        1: keyword.include.huff
+        2: string.quoted.double.huff
+
+  numbers:
+    - match: \b(?:0[xX])(?:[0-9a-fA-F]+)
+      scope: constant.numeric.hex.huff
+    - match: \b(?:[-]?)(?:[0-9]+)
+      scope: constant.numeric.integer.decimal.huff
+
+  opcodes:
+    - match: \b((swap1|dup1)[0-6]|(swap|dup)[1-9]|push3[0-2]|push[1-2][0-9]|push[1-9]|sstore|sload|mstore8|mstore|mload|pop|msize|balance|address|returndatacopy|returndatasize|extcodecopy|extcodesize|gasprice|caller|origin|gaslimit|difficulty|number|timestamp|coinbase|blockhash|codecopy|codesize|calldatacopy|calldatasize|calldataload|callvalue|gas)\b
+      scope: entity.name.function.inputs.huff
+    - match: \b(not|xor|or|and|ror|rol|sar|shr|shl|keccak|sha3|byte|iszero|eq|sgt|slt|gt|lt|signextend|exp|mulmod|addmod|smod|mod|sdiv|div|sub|mul|add)\b
+      scope: keyword.operator.arithmetic
+    - match: \b(log4|log3|log2|log1|log0|jumpdest|getpc|jumpi|jump|create2|staticcall|delegatecall|callcode|call|create)\b
+      scope: support.type.sideeffects.huff
+    - match: \b(selfdestruct|invalid|revert|return|stop)\b
+      scope: support.type.exception.huff
+
+  define:
+    - match: (#define\s+macro)(\s+([A-Za-z_]\w*))\b(\s+=\s+((takes)\s*(\((\d+)\)))(\s+(returns)\s*(\((\d+)\))))?
+      captures:
+        1: storage.macro.huff
+        3: entity.name.function.huff
+
+    - match: (#define\s+jumptable)(\s+([A-Za-z_]\w*))\b
+      captures:
+        1: storage.macro.huff
+        3: entity.name.function.huff
+
+    - match: (#define\s+jumptable__packed)(\s+([A-Za-z_]\w*))\b",
+      captures: 
+        1: storage.macro.huff
+        3: entity.name.function.huff
+
+  interface:
+    - match: (#define\s+function)(\s+([A-Za-z_]\w*))\b
+      captures:
+        1: storage.function.huff
+        3: entity.name.function.huff
+        8: keyword.modifier.huff
+    - match: \b(address|string\d*|bytes\d*|int\d*|uint\d*|bool|hash\d*)\b,
+      captures:
+        1: variable.parameter
+    - match: \b(nonpayable|view|returns)\b
+      captures:
+        1: storage.type.interface.huff
+    - match: (#define\s+event)(\s+([A-Za-z_]\w*))\b,
+      captures:
+        1: storage.event.huff
+        3: entity.name.function.huff
+        8: keyword.modifier.huff
+
+  constant:
+    - match: (#define\s+constant)(\s+([A-Za-z_]\w*))\b
+      captures:
+        1: storage.constant.huff
+        3: constant.name.huff
+    - match: (\[[A-Z_]+\])
+      captures: 
+        1: constant.name.huff
+  
