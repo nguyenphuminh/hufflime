@@ -7,7 +7,7 @@ Sublime Text syntax highlighting for Huff
 2. Copy/move the directory into:
   - Linux: `~/.config/sublime-text/Packages/`
   - MacOS: `~/Library/Application Support/Sublime Text/Packages/`
-  - Windows: `%APPDATA%\Sublime Text\Packages\ArnoldC`
+  - Windows: `%APPDATA%\Sublime Text\Packages\`
 3. Start coding Huff in Sublime 😎
 
 ## Resources
